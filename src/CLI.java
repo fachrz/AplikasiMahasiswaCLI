@@ -214,10 +214,20 @@ public class CLI {
         boolean flag = false;
         int eindex = 0;
 
-        //validation
         nim = input[1];
         nama = input[2].replace("_", " ");
         tglLhr = toDate(input[3]);
+
+        //validation
+        if (!isNumber(nim)){
+            System.out.println("NIM harus berupa angka");
+            return;
+        }
+
+        if (tglLhr == null){
+            System.out.println("Format Tanggal Lahir tidak valid");
+            return;
+        }
 
         //cari nomor indexnya dari nim
         for (int x = 0; x < lastRow; x++){
@@ -231,6 +241,8 @@ public class CLI {
         if (flag) {
             mahasiswa[eindex].setMahasiswa(nim, nama, tglLhr);
             System.out.println("Data " + nim + " berhasil di perbaharui");
+        }else{
+            System.out.println("NIM tidak dapat ditemukan");
         }
     }
 
