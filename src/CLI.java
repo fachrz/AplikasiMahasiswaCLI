@@ -230,6 +230,7 @@ public class CLI {
         //process edit
         if (flag) {
             mahasiswa[eindex].setMahasiswa(nim, nama, tglLhr);
+            System.out.println("Data " + nim + " berhasil di perbaharui");
         }
     }
 
