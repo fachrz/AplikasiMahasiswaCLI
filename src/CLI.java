@@ -16,7 +16,7 @@ public class CLI {
      * Main Method
      * @param args
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("===================================");
         System.out.println("Aplikasi Data mahasiswa (CLI)");
         System.out.println("===================================");
@@ -26,10 +26,16 @@ public class CLI {
         Scanner cliInput = new Scanner(System.in);
 
         String cmdInput;
-        do {
-            System.out.print(">>");
-            cmdInput = cliInput.nextLine();
-        }while(cmdProcessing(cmdInput));
+
+        try {
+            do {
+                System.out.print(">>");
+                cmdInput = cliInput.nextLine();
+            }while(cmdProcessing(cmdInput));
+        }catch (Exception e){
+            throw e;
+        }
+
     }
 
     /**
@@ -37,32 +43,54 @@ public class CLI {
      *
      * @param in
      */
-    public static boolean cmdProcessing(String in){
+    public static boolean cmdProcessing(String in) {
         boolean result = true;
         String[] cmd = in.split(" ");
 
-        switch (cmd[0]){
-            case "add":
-                addProcess(cmd);
-                break;
-            case "delete":
-                deleteProcess(cmd);
-                break;
-            case "edit":
-                System.out.println("Sedang dalam pengembangan");
-                break;
-            case "list":
-                listProcess();
-                break;
-            case "exit":
-                System.out.println("dadah!!");
-                System.exit(0);
-            case "help":
-                helpProcess();
-                break;
-            default:
-                System.out.println("Perintah tidak ditemukan!!");
-                break;
+        try {
+            switch (cmd[0]){
+                case "add":
+                    if (cmd.length == 4){
+                        addProcess(cmd[1], cmd[2], cmd[3]);
+                    }else if(cmd.length < 4){
+                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (ex: add <nim> <nama> <tngl_lahir>)");
+                    }else{
+                        System.out.println("Perintah \"add\" tidak sesuai!");
+                    }
+                    break;
+                case "delete":
+                    if (cmd.length == 2){
+                        deleteProcess(cmd[1]);
+                    }else if(cmd.length == 1){
+                        System.out.println("NIM dibutuhkan (ex: delete <nim>)");
+                    }else{
+                        System.out.println("Perintah \"delete\" tidak sesuai!");
+                    }
+                    break;
+                case "edit":
+                    if (cmd.length == 4){
+                        editProcess(cmd);
+                    }else if(cmd.length < 4){
+                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (ex: edit <nim> <nama> <tngllahir>)");
+                    }else{
+                        System.out.println("Perintah \"edit\" tidak sesuai!");
+                    }
+                    break;
+                case "list":
+                    listProcess();
+                    break;
+                case "exit":
+                    System.out.println("dadah!!");
+                    System.exit(0);
+                case "help":
+                    helpProcess();
+                    break;
+                default:
+                    System.out.println("Perintah tidak tersedia");
+                    break;
+            }
+        }catch (Exception e){
+
         }
 
         return result;
@@ -72,16 +100,18 @@ public class CLI {
      * Proses perintah "add"
      *
      */
-    public static void addProcess(String[] cmd){
-        String nim = cmd[1];
-        String nama = cmd[2];
-
+    public static void addProcess(String nim, String nama, String tglLahir) {
         if (lastRow < maxData){
-            mahasiswa[lastRow] = new Mahasiswa();
-            if (mahasiswa[lastRow].setData(nim, nama)) {
-                lastRow++;
-                System.out.println("Data berhasil disimpan");
+            try {
+                mahasiswa[lastRow] = new Mahasiswa();
+                if (mahasiswa[lastRow].setMahasiswa(nim, nama, tglLahir)) {
+                    lastRow++;
+                    System.out.println("Data berhasil disimpan");
+                }
+            }catch (Exception e){
+                System.out.println("Gagal menambahkan, terjadi masalah pada aplikasi");
             }
+
         }else{
             System.out.println("Maaf penyimpanan sudah penuh");
         }
@@ -90,17 +120,60 @@ public class CLI {
     /**
      * Proses perintah "delete"
      *
+     * delete <nim>
      */
-    public static void deleteProcess(String[] cmd) {
-        int dindex = Integer.parseInt(cmd[1]);
-        for (int i = dindex; i < lastRow; i++){
-            if (i + 1 != lastRow){
-                mahasiswa[i] = mahasiswa[i+1];
-            }else{
-                mahasiswa[i] = null;
+    public static void deleteProcess(String nim){
+        int dindex = 0;
+        boolean flag = false;
+
+        //mencari index
+        for (int x = 0; x < lastRow; x++){
+            if (nim.equals(mahasiswa[x].getMahasiswa()[0])){
+                dindex = x;
+                flag = true;
             }
         }
-        lastRow--;
+
+        if (flag){
+            //delete process begin
+            for (int i = dindex; i < lastRow; i++){
+                if (i + 1 != lastRow){
+                    mahasiswa[i] = mahasiswa[i+1];
+                }else{
+                    mahasiswa[i] = null;
+                }
+            }
+            System.out.println("NIM " + nim + " berhasil dihapus");
+            lastRow--;
+        }else{
+            System.out.println("NIM tidak ditemukan");
+        }
+    }
+
+    /**
+     * Proses perintah "edit"
+     *
+     */
+    public static void editProcess(String[] input) throws Exception {
+        //edit <nim> optional: <nama> <tngllahir>
+        int eindex = Integer.parseInt(input[1]);
+        String nim = input[1];
+        String nama = input[2];
+        String tnglLahir = input[3];
+        boolean flag = false;
+
+        //mencari index
+        for (int x = 0; x < lastRow; x++){
+            if (input[1].equals(mahasiswa[x].getMahasiswa()[0])){
+                eindex = x;
+                flag = true;
+            }
+        }
+
+        //process edit
+        if (flag) {
+            mahasiswa[eindex].setMahasiswa(nim, nama, tnglLahir);
+        }
     }
 
     /**
@@ -111,7 +184,7 @@ public class CLI {
     {
         System.out.println("Nim \t\t Nama \t\t Tanggal");
         for (int i = 0; i < lastRow; i++){
-            String[] mhsw = mahasiswa[i].showData();
+            String[] mhsw = mahasiswa[i].getMahasiswa();
             System.out.println(mhsw[0] + "\t\t" + mhsw[1] + "\t\t" + mhsw[2]);
         }
 
