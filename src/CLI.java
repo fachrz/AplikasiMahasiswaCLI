@@ -20,26 +20,24 @@ public class CLI {
      * Main Method
      * @param args
      */
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args){
         System.out.println("===================================");
         System.out.println("Aplikasi Data mahasiswa (CLI)");
         System.out.println("===================================");
 
+        //run help for the first time
         helpProcess();
 
-        Scanner cliInput = new Scanner(System.in);
-
-        String cmdInput;
-
         try {
+            Scanner cliInput = new Scanner(System.in);
+
+            String cmdInput;
+
             do {
                 System.out.print(">>");
                 cmdInput = cliInput.nextLine();
             }while(cmdProcessing(cmdInput));
-        }catch (Exception e){
-            throw e;
-        }
-
+        }catch (Exception ignored){}
     }
 
     /**
