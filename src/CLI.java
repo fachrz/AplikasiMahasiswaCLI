@@ -38,15 +38,15 @@ public class CLI {
      * @param in
      */
     public static boolean cmdProcessing(String in){
-        String[] cmd = in.split(" ");
         boolean result = true;
+        String[] cmd = in.split(" ");
 
         switch (cmd[0]){
             case "add":
                 addProcess(cmd);
                 break;
             case "delete":
-                System.out.println("Sedang dalam pengembangan");
+                deleteProcess(cmd);
                 break;
             case "edit":
                 System.out.println("Sedang dalam pengembangan");
@@ -69,11 +69,11 @@ public class CLI {
     }
 
     /**
-     * add process
+     * Proses perintah "add"
      *
      */
     public static void addProcess(String[] cmd){
-        int nim = Integer.parseInt(cmd[1]);
+        String nim = cmd[1];
         String nama = cmd[2];
 
         if (lastRow < maxData){
@@ -87,6 +87,26 @@ public class CLI {
         }
     }
 
+    /**
+     * Proses perintah "delete"
+     *
+     */
+    public static void deleteProcess(String[] cmd) {
+        int dindex = Integer.parseInt(cmd[1]);
+        for (int i = dindex; i < lastRow; i++){
+            if (i + 1 != lastRow){
+                mahasiswa[i] = mahasiswa[i+1];
+            }else{
+                mahasiswa[i] = null;
+            }
+        }
+        lastRow--;
+    }
+
+    /**
+     * Proses perintah "list"
+     *
+     */
     public static void listProcess()
     {
         System.out.println("Nim \t\t Nama \t\t Tanggal");
