@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DataMahasiswaConsole.iml" filepath="$PROJECT_DIR$/DataMahasiswaConsole.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DataMahasiswaCLI.iml" filepath="$PROJECT_DIR$/DataMahasiswaCLI.iml" />
     </modules>
   </component>
 </project>
