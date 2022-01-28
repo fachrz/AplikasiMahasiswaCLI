@@ -1,4 +1,3 @@
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -7,10 +6,10 @@ public class Mahasiswa {
     protected String nama;
     protected Date tnglLahir;
 
-    public boolean setMahasiswa(String nim, String nama, String tnglLahir) throws Exception {
+    public boolean setMahasiswa(String nim, String nama, Date tnglLahir) throws Exception {
         this.nim = nim;
         this.nama = nama;
-        this.tnglLahir = new SimpleDateFormat("dd/MM/yyyy").parse(tnglLahir);
+        this.tnglLahir = tnglLahir;
 
         return true;
     }

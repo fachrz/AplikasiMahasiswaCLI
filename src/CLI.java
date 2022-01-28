@@ -1,4 +1,8 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Scanner;
+import java.util.regex.Pattern;
 
 /**
  * Aplikasi manajemen data mahasiswa
@@ -51,9 +55,10 @@ public class CLI {
             switch (cmd[0]){
                 case "add":
                     if (cmd.length == 4){
-                        addProcess(cmd[1], cmd[2], cmd[3]);
+                        addProcess(cmd);
                     }else if(cmd.length < 4){
-                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (ex: add <nim> <nama> <tngl_lahir>)");
+                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (add <nim> <nama> <tngl_lahir>)");
+                        System.out.println("ex: add 20394808 John_Doe 12/12/1992");
                     }else{
                         System.out.println("Perintah \"add\" tidak sesuai!");
                     }
@@ -62,7 +67,8 @@ public class CLI {
                     if (cmd.length == 2){
                         deleteProcess(cmd[1]);
                     }else if(cmd.length == 1){
-                        System.out.println("NIM dibutuhkan (ex: delete <nim>)");
+                        System.out.println("NIM dibutuhkan (delete <nim>)");
+                        System.out.println("ex: delete 20394808");
                     }else{
                         System.out.println("Perintah \"delete\" tidak sesuai!");
                     }
@@ -71,7 +77,8 @@ public class CLI {
                     if (cmd.length == 4){
                         editProcess(cmd);
                     }else if(cmd.length < 4){
-                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (ex: edit <nim> <nama> <tngllahir>)");
+                        System.out.println("NIM, Nama, Tngl. Lahir dibutuhkan (edit <nim> <nama> <tngllahir>)");
+                        System.out.println("ex: edit 20029348 John_This 16/09/1995)");
                     }else{
                         System.out.println("Perintah \"edit\" tidak sesuai!");
                     }
@@ -90,28 +97,74 @@ public class CLI {
                     break;
             }
         }catch (Exception e){
-
+            System.out.println("Terjadi masalah pada aplikasi");
         }
 
         return result;
     }
 
     /**
+     * Memeriksa apakah string itu numerik atau tidak
+     * @param strNum
+     * @return
+     */
+    public static boolean isNumber(String strNum){
+        if (strNum == null){
+            return false;
+        }
+
+        Pattern pattern = Pattern.compile("-?\\d+(\\.\\d+)?");
+        return pattern.matcher(strNum).matches();
+    }
+
+    /**
+     * Mengubah string tanggal menjadi Date jika sesuai dengan format
+     *
+     * @param string
+     * @return
+     */
+    public static Date toDate(String string){
+        Date tglLhr;
+        try {
+            tglLhr = new SimpleDateFormat("dd/MM/yyyy").parse(string);
+        } catch (ParseException pe) {
+            tglLhr = null;
+        }
+
+        return tglLhr;
+    }
+
+    /**
      * Proses perintah "add"
      *
+     * add <nim: string> <nama: string> <tnglLahir: String>
      */
-    public static void addProcess(String nim, String nama, String tglLahir) {
-        if (lastRow < maxData){
-            try {
-                mahasiswa[lastRow] = new Mahasiswa();
-                if (mahasiswa[lastRow].setMahasiswa(nim, nama, tglLahir)) {
-                    lastRow++;
-                    System.out.println("Data berhasil disimpan");
-                }
-            }catch (Exception e){
-                System.out.println("Gagal menambahkan, terjadi masalah pada aplikasi");
-            }
+    public static void addProcess(String[] input) throws Exception {
+        String nim, nama;
+        Date tglLhr;
 
+        nim = input[1];
+        nama = input[2].replace("_", " ");
+        tglLhr = toDate(input[3]);
+
+        //validation
+        if (!isNumber(nim)){
+            System.out.println("NIM harus berupa angka");
+            return;
+        }
+
+        if (tglLhr == null){
+            System.out.println("Format Tanggal Lahir tidak valid");
+            return;
+        }
+
+        //insert process
+        if (lastRow < maxData){
+            mahasiswa[lastRow] = new Mahasiswa();
+            if (mahasiswa[lastRow].setMahasiswa(nim, nama, tglLhr)) {
+                lastRow++;
+                System.out.println("Data berhasil disimpan");
+            }
         }else{
             System.out.println("Maaf penyimpanan sudah penuh");
         }
@@ -153,16 +206,20 @@ public class CLI {
     /**
      * Proses perintah "edit"
      *
+     * edit <nim> <nama> <tnglLahir>
      */
     public static void editProcess(String[] input) throws Exception {
-        //edit <nim> optional: <nama> <tngllahir>
-        int eindex = Integer.parseInt(input[1]);
-        String nim = input[1];
-        String nama = input[2];
-        String tnglLahir = input[3];
+        String nim, nama;
+        Date tglLhr;
         boolean flag = false;
+        int eindex = 0;
 
-        //mencari index
+        //validation
+        nim = input[1];
+        nama = input[2].replace("_", " ");
+        tglLhr = toDate(input[3]);
+
+        //cari nomor indexnya dari nim
         for (int x = 0; x < lastRow; x++){
             if (input[1].equals(mahasiswa[x].getMahasiswa()[0])){
                 eindex = x;
@@ -172,7 +229,7 @@ public class CLI {
 
         //process edit
         if (flag) {
-            mahasiswa[eindex].setMahasiswa(nim, nama, tnglLahir);
+            mahasiswa[eindex].setMahasiswa(nim, nama, tglLhr);
         }
     }
 
